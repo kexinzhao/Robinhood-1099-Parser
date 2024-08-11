@@ -24,7 +24,7 @@ class Sales2020(SalesInterface):
         assert(Sales2020._date_pattern.match(data[1])) # sold_date
         assert(Sales2020._quantity_pattern.match(data[2])) # quantity
         assert(re.match(f"^\-?{self._comma_number_pat}\.\d\d( [NG])?$", data[3])) # proceeds
-        assert(Sales2020._date_pattern.match(data[4])) # acquired_date
+        #assert(Sales2020._date_pattern.match(data[4])) # acquired_date
         assert(Sales2020._money_pattern.match(data[5])) # cost
         assert(re.match(f"^(\-?{self._comma_number_pat}\.\d\d [W])?$", data[6])) # wash_sales_loss
         assert(Sales2020._money_pattern.match(data[7])) # gain_loss
@@ -53,7 +53,6 @@ class Sales2020(SalesInterface):
                 shift += 1
                 continue
 
-
             n = 0
             while n < cnt:
                 shift += 1
@@ -62,15 +61,24 @@ class Sales2020(SalesInterface):
 
                 # quantity
                 if not Sales2020._quantity_pattern.match(raw_data[shift+shift_extra]):
-                    if cnt > 1: continue
-                    else: break
+                    if cnt > 1: 
+                        print(f"break on quantity cnt > 1 on this item {raw_data[shift+shift_extra]}")
+                        continue
+                    else:
+                        print(f"break on quantity on this item {raw_data[shift+shift_extra]}") 
+                        break
                 filtered.append(raw_data[shift+shift_extra])
 
                 # proceeds
                 if not Sales2020._money_pattern.match(raw_data[shift+shift_extra+1]):
-                    if cnt > 1: continue
-                    else: break
+                    if cnt > 1: 
+                        print(f"break on proceeds cnt > 1 on this item {raw_data[shift+shift_extra+1]}")
+                        continue
+                    else:
+                        print(f"break on proceeds on this item {raw_data[shift+shift_extra+1]}") 
+                        break
                 filtered.append(raw_data[shift+shift_extra+1])
+
                 # Gross Net - Potential Extra character
                 gross_net = raw_data[shift+shift_extra+2]
                 if gross_net == 'N' or gross_net == 'G':
@@ -79,14 +87,32 @@ class Sales2020(SalesInterface):
 
                 # date_acquired
                 if not Sales2020._date_pattern.match(raw_data[shift+shift_extra+2]):
-                    if cnt > 1: continue
-                    else: break
-                filtered.append(raw_data[shift+shift_extra+2])
+                    if cnt > 1: 
+                        print(f"break on date_acquired cnt > 1 on this item {raw_data[shift+shift_extra+2]}")
+                        continue
+                    else:
+                        if raw_data[shift+shift_extra+2] == 'Various': 
+                            #print(f"break on date_acquired on this item {raw_data[shift+shift_extra+2 : shift+shift_extra+4]}")
+                            filtered.append("Various")
+                        elif raw_data[shift+shift_extra+2] == 'V':
+                            #print(f"break on date_acquired on this item {raw_data[shift+shift_extra+2 : shift+shift_extra+10]}")
+                            filtered.append("Various")
+                            shift_extra += 6
+                        else:
+                            #raise Exception("wrong date_acquired")
+                            #print(f"break on date_acquired on this item {raw_data[shift+shift_extra+2 : shift+shift_extra+4]}")
+                            break
+                else:
+                    filtered.append(raw_data[shift+shift_extra+2])
 
                 # cost
                 if not Sales2020._money_pattern.match(raw_data[shift+shift_extra+3]): 
-                    if cnt > 1: continue
-                    else: break
+                    if cnt > 1: 
+                        print(f"break on cost cnt > 1 on this item {raw_data[shift+shift_extra+3]}")
+                        continue
+                    else:
+                        print(f"break on cost on this item {raw_data[shift+shift_extra+3]}") 
+                        break
                 filtered.append(raw_data[shift+shift_extra+3])
 
                 # wash_sales_loss
@@ -101,16 +127,25 @@ class Sales2020(SalesInterface):
                         shift_extra += 1
 
                 else:
-                    if cnt > 1: continue
-                    else: break
+                    if cnt > 1: 
+                        print(f"break on wash_sales_loss cnt > 1 on this item {raw_data[shift+shift_extra+4]}")
+                        continue
+                    else:
+                        print(f"break on wash_sales_loss on this item {raw_data[shift+shift_extra+4]}") 
+                        break
                 
                 # gain_loss
                 if not Sales2020._money_pattern.match(raw_data[shift+shift_extra+5]):
-                    if cnt > 1: continue
-                    else: break
+                    if cnt > 1: 
+                        print(f"break on gain_loss cnt > 1 on this item {raw_data[shift+shift_extra+5]}")
+                        continue
+                    else:
+                        print(f"break on gain_loss on this item {raw_data[shift+shift_extra+5]}") 
+                        break
                 filtered.append(raw_data[shift+shift_extra+5])
                 
                 if cnt > 1:
+                    print("enter final cnt > 1 check")
                     # Count check
                     raw_nth = raw_data[shift+shift_extra+6]
                     nth_i = 1

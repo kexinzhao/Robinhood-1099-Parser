@@ -27,7 +27,8 @@ class Parser2020(ParserInterface):
             if self.contains(keystr, p):
 
                 strings = self.viewer.canvas.strings
-                # print(self.viewer.canvas.text_content) # contains format information
+                #print(self.viewer.canvas.text_content) # contains format information
+                #print(strings)	
                 
                 prev_idx = -1
                 while idx := next((i for i, val in enumerate(strings[prev_idx+1:]) if "Symbol:" in val and "CUSIP:" in val), None):
@@ -35,8 +36,10 @@ class Parser2020(ParserInterface):
                     if prev_idx >= 0:
                         raw_entries = last_raw_entries + strings[prev_idx:prev_idx+idx+1]
                         last_raw_entries = []
+                        #print(f'raw_entries: {raw_entries}')
                         pdf_contents.add_sales(Sales2020.parse(raw_entries))
                     elif "(cont'd)" not in strings[prev_idx+idx+1]:
+                        #print(f'last_raw_entries: {last_raw_entries}')
                         pdf_contents.add_sales(Sales2020.parse(last_raw_entries))
                         last_raw_entries = []
 
@@ -45,6 +48,8 @@ class Parser2020(ParserInterface):
                     
                 # Last entry of the page // concatentate
                 last_raw_entries += strings[prev_idx:]
+                #print(pdf_contents)
+                #break
 
         pdf_contents.add_sales(Sales2020.parse(last_raw_entries))
         return pdf_contents

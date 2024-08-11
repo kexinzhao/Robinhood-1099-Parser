@@ -29,6 +29,7 @@ def main():
     if not args.csv:
         args.csv = 'output.csv'
 
+    print("updated main.py")
 
     parser = Parser2020(args.pdf_path)
     contents = parser.process(not args.silent)
